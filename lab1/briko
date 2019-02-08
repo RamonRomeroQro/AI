@@ -1,0 +1,62 @@
+//Declara tus brikos
+distancebk sensor (PORT4);
+motorbk motor1 (PORT2);
+motorbk motor2 (PORT6);
+ledsbk luz (PORT7);
+
+int degree90 = 918;
+int degree60 = 1224;
+
+
+int flag = -1;
+int d = 2;
+
+
+void draw(){
+    motor1.set(LEFT);
+    motor2.set(RIGHT);
+    delay(2000);
+  if(flag==1){
+    luz.color(BLUE);
+    motor1.set(LEFT);
+    motor2.set(LEFT);
+    delay(degree60);
+  }
+  
+  else{
+    luz.color(RED);
+    motor1.set(LEFT);
+    motor2.set(LEFT);
+    delay(degree90);
+  }
+  if(sensor.read() >= 0 && sensor.read() <= 16){
+    flag =flag * -1;
+  }
+}
+
+/////Escribe tu codigo
+code(){
+  draw();  
+}
+/////Termina loop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
