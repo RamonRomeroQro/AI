@@ -91,6 +91,12 @@ firefight();
 /////Termina loop
 
 
+//Explore world.
+//If it find light -> stop && beep
+//If it find object -> 90 degree turn
+
+
+
 
 
 

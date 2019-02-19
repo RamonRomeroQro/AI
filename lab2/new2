@@ -1,0 +1,37 @@
+distancebk sensordistancia (PORT7);
+temperaturebk sensortemperatura (PORT5);
+lightbk sensorluz (PORT3);
+buzzerbk bocina (PORT4);
+motorbk motor1 (PORT2);
+motorbk motor2 (PORT6);
+
+int degree90 = 918;
+int degree60 = 1224;
+void firefight(){
+  if (sensorluz.read()>40){
+    motor1.set(STOP);
+    motor2.set(STOP);
+    bocina.set(ON);
+  }else{
+    bocina.set(OFF);
+    if (sensordistancia.read(CM)<15 && sensordistancia.read(CM)>=0){
+      motor1.set(LEFT);
+      motor2.set(LEFT);
+      delay(918);
+    }else{
+      motor1.set(LEFT);
+      motor2.set(RIGHT);
+      delay(500);
+      motor1.set(LEFT);
+      motor2.set(LEFT);
+      int d = random(0,918);
+      delay(d);
+    }  
+  }
+}
+
+/////Escribe tu codigo
+code(){
+  firefight();
+}
+/////Termina loop
