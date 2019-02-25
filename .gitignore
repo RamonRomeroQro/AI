@@ -1,3 +1,5 @@
 venv
 *.out
 .DS*
+.vscode
+
