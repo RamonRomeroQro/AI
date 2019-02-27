@@ -115,7 +115,7 @@ public class Main {
     }
 }
 
-public class Node{
+class Node{
     
 
     
