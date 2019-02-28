@@ -1,31 +1,10 @@
-'''
-    Copyright 2019 © Ramón Romero @ramonromeroqro
-    Intelligent Systems, ITESM.
-    A01700318 for ITESM
-    Asumming not samples, instead complete population.
-
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-'''
-
-
 from collections import deque
 
 
 class GraphSearchSpace():
     def __init__(self):
         self.nodes = set()
+     
 
         #n1_to_n2=Edge(node1, node2, o_stack, dest_stack)
         #n2_to_n1=Edge(node1, node2, dest_stack, o_stack)
@@ -53,8 +32,9 @@ class Edge():
         # Example: moving a container from stack 2 to stack 4 takes 0.5 + abs(2 - 4) + 0.5 = 3 minutes.
         self.cost = 1+abs(o_stack-dest_stack)
 
+
     def __str__(self):
-        return (f'--({self.cost}, {self.origin_stack}, {self.destination_stack})--> ')+str(self.destination)
+       return (f'--({self.cost}, {self.origin_stack}, {self.destination_stack})--> ')+str(self.destination)
 
     def __eq__(self, other):
         if isinstance(other, Edge):
@@ -95,31 +75,50 @@ class Node:
         self.max_height = h
         self.structure = structure
         self.conections = set()
+        
+    def __init__(self):
+        self.num_stacks = 0
+        self.max_height = 0
+        self.structure = []
+        self.conections = set()
+        
 
     def generate_paths(self, gsp):
-        # print('genfor',self.structure)
-
-        q = deque([i for i in range(0, self.num_stacks)])
-        for i in range(0, self.num_stacks):
-            e = q.popleft()
+        #print('genfor',self.structure)
+        
+        q=deque([i for i in range(0,self.num_stacks)])
+        for i in range(0,self.num_stacks):
+            e=q.popleft()
             q.append(e)
-            for j in range(1+i, len(q)):
-                # print(i,j)
-                self.transition_model(i, j, gsp)
+            for j in range(i,len(q)):
+        # print(i,j)
+                self.transition_model(i,j,gsp)
 
     def transition_model(self, origin_stack, destination_stack, gsp):
+
+        
         if len(self.structure[destination_stack])+1 <= self.max_height and (len(self.structure[origin_stack])-1) >= 0:
-            new_structure = list(map(list, self.structure))
-            e = new_structure[origin_stack].pop()
-            new_structure[destination_stack].append(e)
-            new_node = Node(new_structure, self.max_height)
+           
+            new_node=Node()
+            if origin_stack==destination_stack and (len(self.structure[origin_stack])-1) >= 0:
+                new_structure = list(map(list, self.structure))
+                e = new_structure[origin_stack].pop()
+                new_node.structure=new_structure
+                new_node.max_height=self.max_height
+            else:
+
+                new_structure = list(map(list, self.structure))
+                e = new_structure[origin_stack].pop()
+                new_structure[destination_stack].append(e)
+                new_node.structure=new_structure
+                new_node.structure=self.max_height
 
             gsp.nodes.add(self)
 
-            evaluation_set = set()
+            evaluation_set=set()
             evaluation_set.add(new_node)
-            evaluation_set = evaluation_set.intersection(gsp.nodes)
-            if len(evaluation_set) == 0:
+            evaluation_set=evaluation_set.intersection(gsp.nodes)
+            if len(evaluation_set)==0:
                 gsp.nodes.add(new_node)
                 # conect to new
                 #print(self.structure,'\t->\t', new_node.structure)
@@ -134,46 +133,44 @@ class Node:
 
 
 def ucs(start_node, goal_node):
-    explored = set()
-    pq = PriorityQueue()
+    explored=set()
+    pq=PriorityQueue()
     pq.add((start_node, 0))
     while(True):
         print(str(pq))
-        if pq.is_empty() == True:
+        if pq.is_empty()==True:
             return "failed"
-        nodo, cost = pq.pop()
-        if nodo == goal_node:
+        nodo, cost =pq.pop()
+        if nodo==goal_node:
             explored.add(nodo)
             print(cost, nodo)
             return "founded"
         print("expanded ___!", nodo, cost)
-        for i in nodo.conections:  # expansion
-            conex = i.destination
-            cost_n = i.cost
-            if conex not in explored:  # or conex not frontier:
-                pq.add((conex, cost_n+cost))
+        for i in nodo.conections: #expansion
+            conex=i.destination
+            cost_n=i.cost
+            if conex not in explored: #or conex not frontier:
+                pq.add((conex,cost_n+cost))
+            
 
 
 def main():
-
+    
     max_height = int(input())
     start_structure = str(input())
     goal_structure = str(input())
     start_structure = start_structure.strip().split(";")
     goal_structure = goal_structure.strip().split(";")
-    start_structure = list(
-        map(lambda x: x.strip().strip("(").strip(")"), start_structure))
-    goal_structure = list(
-        map(lambda x: x.strip().strip("(").strip(")"), goal_structure))
-    start_structure = list(map(lambda x: x.split(
-        ", ") if x != '' else [], start_structure))
-    goal_structure = list(map(lambda x: x.split(
-        ", ") if x != '' else [], goal_structure))
-    print('G?->', goal_structure)
-    print('S?->', start_structure)
-    gsp = GraphSearchSpace()
+    start_structure = list(map(lambda x: x.strip().strip("(").strip(")"), start_structure))
+    goal_structure = list(map(lambda x: x.strip().strip("(").strip(")"), goal_structure))
+    start_structure = list(map(lambda x: x.split(", ") if x != '' else [], start_structure))
+    goal_structure = list(map(lambda x: x.split(", ") if x != '' else [], goal_structure))
+    print('G?->',goal_structure)
+    print('S?->',start_structure)
+    gsp=GraphSearchSpace()
     initialState = Node(start_structure, max_height)
     initialState.generate_paths(gsp)
+    
 
     #max_height = 2
     #goal_structure = [['A', 'C'], [], []]
@@ -186,19 +183,20 @@ def main():
     # second = Node(start_structure, max_height)
     # print(second in a)
 
+
+
     initialState.generate_paths(gsp)
 
-    if goalState not in gsp.nodes:
+    if goalState not in  gsp.nodes:
         print("Not Found GoalState")
     else:
         print("Found GoalState")
 
     ucs(initialState, goalState)
-    # print("kmkm")
-    # print(gsp.__str__())
-    # for i in initialState.conections:
-    # print(i)
-
+    #print("kmkm")
+    #print(gsp.__str__())
+    #for i in initialState.conections:
+        #print(i)
 
 '''
 
@@ -219,30 +217,32 @@ function UNIFORM-COST-SEARCH(problem) returns a solution, or failure
 
 '''
 
-
 class PriorityQueue():
 
     def is_empty(self):
-        if len(self.q) == 0:
+        if len(self.q)==0:
             return True
         return False
 
     def __init__(self):
-        self.q = deque([])
+        self.q=deque([])
 
     def __str__(self):
-        s = "\n-----------\n"
+        s="\n-----------\n"
         for i in self.q:
-            s = s+str(i[0])+", "+str(i[1])+";\n"
+            s=s+str(i[0])+", "+str(i[1])+";\n"
         return s
 
-    def pop(self):
-        self.q = deque(self.q)
-        return self.q.popleft()
 
+    def pop(self):
+        self.q=deque(self.q)
+        return self.q.popleft()
+    
     def add(self, paired):
         self.q.append(paired)
-        self.q = sorted(self.q, key=lambda x: x[1])
+        self.q=sorted(self.q, key= lambda x : x[1])
+
+    
 
 
 if __name__ == "__main__":
@@ -258,6 +258,11 @@ if __name__ == "__main__":
     # pq.pop()
     # pq.pop()
     # print(str(pq))
+
+
+
+
+
 
 
 #import fileinput
