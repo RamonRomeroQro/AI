@@ -77,19 +77,15 @@ class Node:
         self.conections = set()
 
     def generate_paths(self, gsp):
-        # print('genfor',self.structure)
-        #for i in range(0, self.num_stacks):
-        #   for j in range(0, self.num_stacks):
-        #        self.transition_model(i, j, gsp)
-
+        #print('genfor',self.structure)
+        
         q=deque([i for i in range(0,self.num_stacks)])
         for i in range(0,self.num_stacks):
             e=q.popleft()
             q.append(e)
             for j in range(1+i,len(q)):
-        #         #print(i,j)
+        # print(i,j)
                 self.transition_model(i,j,gsp)
-                self.transition_model(j,i,gsp)
 
     def transition_model(self, origin_stack, destination_stack, gsp):
         if len(self.structure[destination_stack])+1 <= self.max_height and (len(self.structure[origin_stack])-1) >= 0:
@@ -112,11 +108,35 @@ class Node:
                 new_node.generate_paths(gsp)
             else:
                 for i in evaluation_set:
+                    #print("MM", len(evaluation_set))
                     self.add_conection(i, origin_stack, destination_stack)
+                    #i.add_conection(self,destination_stack, origin_stack)
+
+
+def ucs(start_node, goal_node):
+    explored=set()
+    pq=PriorityQueue()
+    pq.add((start_node, 0))
+    while(True):
+        print(str(pq))
+        if pq.is_empty()==True:
+            return "failed"
+        nodo, cost =pq.pop()
+        if nodo==goal_node:
+            explored.add(nodo)
+            print(cost, nodo)
+            return "founded"
+        print("expanded ___!", nodo, cost)
+        for i in nodo.conections: #expansion
+            conex=i.destination
+            cost_n=i.cost
+            if conex not in explored: #or conex not frontier:
+                pq.add((conex,cost_n+cost))
+            
 
 
 def main():
-    '''
+    
     max_height = int(input())
     start_structure = str(input())
     goal_structure = str(input())
@@ -124,20 +144,21 @@ def main():
     goal_structure = goal_structure.strip().split(";")
     start_structure = list(map(lambda x: x.strip().strip("(").strip(")"), start_structure))
     goal_structure = list(map(lambda x: x.strip().strip("(").strip(")"), goal_structure))
-    start_structure = list(map(lambda x: x.split(", ") if x != "X" else [], start_structure))
-    goal_structure = list(map(lambda x: x.split(", ") if x != "X" else [], goal_structure))
-    print(goal_structure)
-    print(start_structure)
+    start_structure = list(map(lambda x: x.split(", ") if x != '' else [], start_structure))
+    goal_structure = list(map(lambda x: x.split(", ") if x != '' else [], goal_structure))
+    print('G?->',goal_structure)
+    print('S?->',start_structure)
     gsp=GraphSearchSpace()
     initialState = Node(start_structure, max_height)
     initialState.generate_paths(gsp)
-    '''
+    
 
-    max_height = 2
-    goal_structure = [['A', 'C'], [], []]
-    start_structure = [['A'], ['B'], ['C']]
+    #max_height = 2
+    #goal_structure = [['A', 'C'], [], []]
+    #start_structure = [['A'], ['B'], ['C']]
     gsp = GraphSearchSpace()
     initialState = Node(start_structure, max_height)
+    goalState = Node(goal_structure, max_height)
     # a=set()
     # a.add(initialState)
     # second = Node(start_structure, max_height)
@@ -146,14 +167,83 @@ def main():
 
 
     initialState.generate_paths(gsp)
+
+    if goalState not in  gsp.nodes:
+        print("Not Found GoalState")
+    else:
+        print("Found GoalState")
+
+    ucs(initialState, goalState)
     #print("kmkm")
-    print(gsp.__str__())
-    for i in initialState.conections:
-        print(i)
+    #print(gsp.__str__())
+    #for i in initialState.conections:
+        #print(i)
+
+'''
+
+[x] S. Russell and P. Norvig, Artificial intelligence, 3rd ed. 2010: Pearson Education,Inc., 2010.
+function UNIFORM-COST-SEARCH(problem) returns a solution, or failure
+    node ← a node with STATE = problem.INITIAL-STATE, PATH-COST = 0
+    frontier ← a priority queue ordered by PATH-COST, with node as the only element explored ← an empty set
+    loop do
+    if EMPTY?(frontier) then return failure
+    node←POP(frontier) /*choosesthelowest-costnodeinfrontier */
+    if problem.GOAL-TEST(node.STATE) then return SOLUTION(node) add node.STATE to explored
+    for each action in problem.ACTIONS(node.STATE) do
+        child ←CHILD-NODE(problem,node,action)
+        if child.STATE is not in explored or frontier then
+            frontier ←INSERT(child,frontier)
+        else if child.STATE is in frontier with higher PATH-COST then
+            replace that frontier node with child
+
+'''
+
+class PriorityQueue():
+
+    def is_empty(self):
+        if len(self.q)==0:
+            return True
+        return False
+
+    def __init__(self):
+        self.q=deque([])
+
+    def __str__(self):
+        s="\n-----------\n"
+        for i in self.q:
+            s=s+str(i[0])+", "+str(i[1])+";\n"
+        return s
+
+
+    def pop(self):
+        self.q=deque(self.q)
+        return self.q.popleft()
+    
+    def add(self, paired):
+        self.q.append(paired)
+        self.q=sorted(self.q, key= lambda x : x[1])
+
+    
 
 
 if __name__ == "__main__":
     main()
+    # pq=PriorityQueue()
+    # pq.add((22, 3))
+    # pq.add((27, 100))
+    # pq.add((1,2 ))
+    # print(str(pq))
+    # pq.add((45, 2))
+    # pq.add((2,3))
+    # print(str(pq))
+    # pq.pop()
+    # pq.pop()
+    # print(str(pq))
+
+
+
+
+
 
 
 #import fileinput
