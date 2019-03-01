@@ -88,7 +88,7 @@ class Node:
         execution_queue = deque([])
         gsp.nodes[self.id] = self
         execution_queue.append(self)
-        while(len(execution_queue)>0):
+        while(len(execution_queue)):
             ex_node = execution_queue.popleft()
             for i in range(0, ex_node.num_stacks):
                 for j in range(0, ex_node.num_stacks):
