@@ -17,6 +17,8 @@
 
 from collections import deque
 import copy
+import random
+
 
 
 class GraphSearchSpace():
@@ -33,32 +35,30 @@ class GraphSearchSpace():
 
             self.heuristic[k] = self.evaluate(m1f, m2f)
 
+    def generate_bad_heuristic(self, goal_structure):
+        random.seed(30)
+        for k, v in self.nodes.items():
+            self.heuristic[k] = random.randint(2,100)
+
     def evaluate(self, m1, m2):
-        d1={}
-        d2={}
-        h={}
+        d1 = {}
+        d2 = {}
+        h = {}
         for i in range(len(m1)):
             for j in range(len(m1[i])):
-                if m1[i][j]!='X':
-                    d1[m1[i][j]]=(i,j)
-        
+                if m1[i][j] != 'X':
+                    d1[m1[i][j]] = (i, j)
+
         for i in range(len(m2)):
             for j in range(len(m2[i])):
-                if m2[i][j]!='X':
-                    d2[m2[i][j]]=(i,j)
-        s=0
+                if m2[i][j] != 'X':
+                    d2[m2[i][j]] = (i, j)
+        s = 0
         for k, v in d1.items():
-            #s=s+abs(d2[k][0]-d1[k][0])+abs(len(m1[d1[k][0]])-d1[k][1])+abs(len(m1[d2[k][0]])-d2[k][1])
+            # s=s+abs(d2[k][0]-d1[k][0])+abs(len(m1[d1[k][0]])-d1[k][1])+abs(len(m1[d2[k][0]])-d2[k][1])
             if k in d2:
-                s=s+abs(d2[k][0]-d1[k][0])
+                s = s+abs(d2[k][0]-d1[k][0])
         return s
-            
-
-
-        
-                
-                
-      
 
     def filling(self, mat):
         for s in mat:
@@ -102,7 +102,7 @@ class Node:
         execution_queue = deque([])
         gsp.nodes[self.id] = self
         execution_queue.append(self)
-        while(len(execution_queue)>0):
+        while(len(execution_queue) > 0):
             ex_node = execution_queue.popleft()
             for i in range(0, ex_node.num_stacks):
                 for j in range(0, ex_node.num_stacks):
@@ -126,9 +126,9 @@ def ucs(start_node, goal_node, gsp):
     pq = PriorityQueue()
     # nodo, currentsume, path, heuristica
     pq.add((gsp.nodes[start_node.id], 0, [], 0))
-    kek=0
+    kek = 0
     while(True):
-        kek=kek+1
+        kek = kek+1
         if pq.is_empty() == True:
             return "No solution found"
         nodo, latest_cost, path = pq.pop()
@@ -148,14 +148,11 @@ def ucs(start_node, goal_node, gsp):
             # print(n_path)
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
-                #print('sss')
+                # print('sss')
                 explored[conex.id] = nodo
-                sortk=(cost_n+latest_cost)+0
+                sortk = (cost_n+latest_cost)+0
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
-
-
-
 
 
 def a_star(start_node, goal_node, gsp):
@@ -163,9 +160,9 @@ def a_star(start_node, goal_node, gsp):
     pq = PriorityQueue()
     # nodo, currentsume, path, heuristica
     pq.add((gsp.nodes[start_node.id], 0, [], 0))
-    kek=0
+    kek = 0
     while(True):
-        kek=kek+1
+        kek = kek+1
         if pq.is_empty() == True:
             return "No solution found"
         nodo, latest_cost, path = pq.pop()
@@ -185,12 +182,11 @@ def a_star(start_node, goal_node, gsp):
             # print(n_path)
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
-                #print('sss')
+                # print('sss')
                 explored[conex.id] = nodo
-                sortk=(cost_n+latest_cost)+gsp.heuristic[conex.id]
+                sortk = (cost_n+latest_cost)+gsp.heuristic[conex.id]
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
-
 
 
 def ucs_greedy(start_node, goal_node, gsp):
@@ -198,9 +194,9 @@ def ucs_greedy(start_node, goal_node, gsp):
     pq = PriorityQueue()
     # nodo, currentsume, path, heuristica
     pq.add((gsp.nodes[start_node.id], 0, [], 0))
-    kek=0
+    kek = 0
     while(True):
-        kek=kek+1
+        kek = kek+1
         if pq.is_empty() == True:
             return "No solution found"
         nodo, latest_cost, path = pq.pop()
@@ -220,13 +216,11 @@ def ucs_greedy(start_node, goal_node, gsp):
             # print(n_path)
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
-                #print('sss')
+                # print('sss')
                 explored[conex.id] = nodo
-                sortk=(cost_n+latest_cost)+0
+                sortk = (cost_n+latest_cost)+0
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
-
-
 
 
 def a_star_greedy(start_node, goal_node, gsp):
@@ -234,9 +228,9 @@ def a_star_greedy(start_node, goal_node, gsp):
     pq = PriorityQueue()
     # nodo, currentsume, path, heuristica
     pq.add((gsp.nodes[start_node.id], 0, [], 0))
-    kek=0
+    kek = 0
     while(True):
-        kek=kek+1
+        kek = kek+1
         if pq.is_empty() == True:
             return "No solution found"
         nodo, latest_cost, path = pq.pop()
@@ -256,13 +250,11 @@ def a_star_greedy(start_node, goal_node, gsp):
             # print(n_path)
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
-                #print('sss')
+                # print('sss')
                 explored[conex.id] = nodo
-                sortk=(cost_n+latest_cost)+gsp.heuristic[conex.id]
+                sortk = (cost_n+latest_cost)+gsp.heuristic[conex.id]
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
-
-
 
 
 def greedy_evaluation(m1, g):
@@ -337,31 +329,34 @@ def main():
                 greedy = True
                 break
     # print(greedy)
-    
 
     # Execute generation of path for Initial node
 
     if greedy == True:
-        #result, iterations = ucs_greedy(initialState, goalState, gsp)
+        rgucs, itgucs = ucs_greedy(initialState, goalState, gsp)
         gsp.generate_heuristic(goalState.structure)
-        result, iterations = (a_star_greedy(initialState, goalState, gsp))
-        print(result)
+        rag, itag = (a_star_greedy(initialState, goalState, gsp))
+        print(itgucs)
+        print(rgucs)
+        print(rag)
+        print(itag)
 
     else:
         if goalState.id in gsp.nodes:
-            #result, iterations = (ucs(initialState, goalState,gsp))
+            rusc, itucs = (ucs(initialState, goalState,gsp))
             gsp.generate_heuristic(goalState.structure)
-            result, iterations = (a_star(initialState, goalState, gsp))
-            print(result)
-
+            ra, ita = (a_star(initialState, goalState, gsp))
+            print(itucs)
+            print(rusc)
+            print(ita)
+            print(ra)
         else:
             print("No solution found")
 
-    #for k,v in gsp.heuristic.items():
+    # for k,v in gsp.heuristic.items():
      #   print(k,v)
 
 
-   
 if __name__ == "__main__":
     main()
 
