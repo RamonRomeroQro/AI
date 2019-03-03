@@ -157,7 +157,7 @@ def ucs(start_node, goal_node, gsp, greedy):
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
                 # print('sss')
-                explored[conex.id] = nodo
+                explored[conex.id] = conex
                 sortk = (cost_n+latest_cost)+0
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
@@ -200,7 +200,7 @@ def a_star(start_node, goal_node, gsp, greedy):
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
                 # print('sss')
-                explored[conex.id] = nodo
+                explored[conex.id] = conex
                 sortk = (cost_n+latest_cost)+gsp.heuristic[conex.id]
                 #print(( cost_n+latest_cost, n_path,  sortk))
                 pq.add((conex, cost_n+latest_cost, n_path,  sortk))
