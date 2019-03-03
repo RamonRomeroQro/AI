@@ -134,12 +134,13 @@ def ucs(start_node, goal_node, gsp, greedy):
         nodo, latest_cost, path = pq.pop()
         #print("...", path)
         if greedy==True:
-              if greedy_evaluation(nodo.structure, goal_node.structure)==True:
+            if greedy_evaluation(nodo.structure, goal_node.structure)==True:
                 explored[nodo.id] = nodo
                 # print(cost, nodo)
                 # print(path)
                 # print(latest_cost)
                 return str(latest_cost)+"\n"+"; ".join([str(x) for x in (path)]), kek
+
         else:
             if nodo.id == goal_node.id:
                 explored[nodo.id] = nodo
@@ -148,6 +149,7 @@ def ucs(start_node, goal_node, gsp, greedy):
                 # print(latest_cost)
                 return str(latest_cost)+"\n"+"; ".join([str(x) for x in (path)]), kek
         # print("expanded ___!", nodo, cost)
+        explored[nodo.id] = nodo
         for t, n in nodo.conections.items():  # expansion
             conex = n
             cost_n = t[2]
@@ -157,10 +159,15 @@ def ucs(start_node, goal_node, gsp, greedy):
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
                 # print('sss')
-                explored[conex.id] = conex
                 sortk = (cost_n+latest_cost)+0
-                #print(( cost_n+latest_cost, n_path,  sortk))
-                pq.add((conex, cost_n+latest_cost, n_path,  sortk))
+                f=False
+                for x in range(len(pq.q)):
+                    if pq.q[x][0].id == conex.id:
+                        x=(conex, cost_n+latest_cost, n_path,  sortk)
+                        f=True
+                        break
+                if f==False:
+                    pq.add((conex, cost_n+latest_cost, n_path,  sortk))
 
 
 def a_star(start_node, goal_node, gsp, greedy):
@@ -191,6 +198,7 @@ def a_star(start_node, goal_node, gsp, greedy):
                 # print(latest_cost)
                 return str(latest_cost)+"\n"+"; ".join([str(x) for x in (path)]), kek
         # print("expanded ___!", nodo, cost)
+        explored[nodo.id] = nodo
         for t, n in nodo.conections.items():  # expansion
             conex = n
             cost_n = t[2]
@@ -200,10 +208,16 @@ def a_star(start_node, goal_node, gsp, greedy):
             n_path.append(trans)
             if conex.id not in explored:  # or conex not frontier:
                 # print('sss')
-                explored[conex.id] = conex
                 sortk = (cost_n+latest_cost)+gsp.heuristic[conex.id]
+                f=False
+                for x in range(len(pq.q)):
+                    if pq.q[x][0].id == conex.id:
+                        x=(conex, cost_n+latest_cost, n_path,  sortk)
+                        f=True
+                        break
+                if f==False:
+                    pq.add((conex, cost_n+latest_cost, n_path,  sortk))
                 #print(( cost_n+latest_cost, n_path,  sortk))
-                pq.add((conex, cost_n+latest_cost, n_path,  sortk))
 
 
 
@@ -283,8 +297,10 @@ def main():
     uc, itucs = ucs(initialState, goalState,gsp, greedy)
     gsp.generate_heuristic(goalState.structure)
     ast, ita = a_star(initialState, goalState, gsp, greedy)
-    print(itucs, uc)
-    print(ita, ast)
+    print(itucs)
+    print( uc)
+    print(ita)
+    print(ast)
     
 
 
