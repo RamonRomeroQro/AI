@@ -1,0 +1,4 @@
+#!/bin/bash
+# ucs. Use a priority queue ordered by the current cost of each node.
+
+python3 program.py +u

@@ -1,0 +1,4 @@
+#!/bin/bash
+# run: Using a consistent heuristic of your choice
+
+python3 program.py +a

@@ -1,0 +1,4 @@
+#!/bin/bash
+#a_star_incons: Using a non-consistent heuristic of your choice
+
+python3 program.py -a
