@@ -1,3 +1,6 @@
+from collections import deque
+import itertools
+
 def total_probalility(probability_table, variables, query, bayes_network):
 	''' P(B) = P(B|A1)*P(A1) + P(B|A2)*P(A2) + ... + P(B|An)*P(An) '''
 
@@ -34,27 +37,70 @@ def bayes_therorem(probability_table, variables, query, bayes_network):
 	''' P(A|B) = (P(B|A) * P(A)) / P(B) '''
 	subqueries = query.split("|")
 	first_numerator_query= "|".join(reversed(subqueries))
-	first_numerator, probability_table= find_probability(first_numerator_query, probability_table, variables, bayes_network)
-	probability_table[first_numerator_query]=first_numerator
+	if first_numerator_query in probability_table or '+'+first_numerator_query[1:] in probability_table or '-'+first_numerator_query[1:] in probability_table:
+		first_numerator, probability_table= find_probability(first_numerator_query, probability_table, variables, bayes_network)
+		probability_table[first_numerator_query]=first_numerator
 
-	second_numerator_query=subqueries[0]
-	second_numerator, probability_table = find_probability(second_numerator_query, probability_table, variables, bayes_network)
-	probability_table[second_numerator_query]=second_numerator
+		second_numerator_query=subqueries[0]
+		second_numerator, probability_table = find_probability(second_numerator_query, probability_table, variables, bayes_network)
+		probability_table[second_numerator_query]=second_numerator
 
-	denominator_query = subqueries[-1]
-	denominator, probability_table = find_probability(denominator_query, probability_table, variables, bayes_network)
-	probability_table[denominator_query]= denominator
+		denominator_query = subqueries[-1]
+		denominator, probability_table = find_probability(denominator_query, probability_table, variables, bayes_network)
+		probability_table[denominator_query]= denominator
 
-	bayes = (first_numerator*second_numerator) / denominator
-	probability_table[query]=bayes
+		bayes = (first_numerator*second_numerator) / denominator
+		probability_table[query]=bayes
+		return bayes, probability_table
 
-	return bayes, probability_table
+	return conditional_probability(probability_table, variables, query, bayes_network)
 
-def conditional_probability():
-	pass
+	
 
-def chain_rule():
-	pass
+
+def conditional_probability(probability_table, variables, query, bayes_network):
+	print(query)
+	new_query = query.split('|')
+	numerator_elements = query.replace('|',',').split(',')
+	numetator_nodes_keys= set([ x[1:] if x.startswith('+') or x.startswith('-')  else x for x in numerator_elements ])
+	print('.N->' ,numerator_elements)
+	print (numetator_nodes_keys)
+	ancestors=set()
+	for e in numetator_nodes_keys:
+		new_ancestors = bayes_network.get_ancestors(e)
+		ancestors = ancestors | new_ancestors
+	node_names_pow2 = (numetator_nodes_keys-ancestors) | (ancestors-numetator_nodes_keys)
+	
+	r=0
+	for ne in numerator_elements:
+		print (ne)
+		ok = ne[1:]
+		nnode = bayes_network.get_node_by_name(ok)
+		if nnode == None:
+			bayes_network(ne[1:])
+		if len(nnode.parents)==0:
+			r=r*probability_table[ne]
+		else:
+			#los papas de que no sabesmos
+			parents_eval = set(nnode.parents.keys())
+			q=[]
+			for k in parents_eval:
+				for i in numerator_elements:
+					if k in i:
+						q.append(i)
+			print(node_names_pow2)
+			signs =  ['+', '-']
+			product_hidden = list(itertools.product(signs, node_names_pow2))
+			new_elements = [str(e[0])+str(e[1]) for e in product_hidden]
+			for e in new_elements:
+				find_probability(nnode.name+"|"+e)
+
+
+
+	denominator_elements = new_query[1].split(',')
+	print('.d->' ,denominator_elements)
+
+	return -2, probability_table
 
 def find_probability(query, probability_table, variables, bayes_network):
 
@@ -104,7 +150,7 @@ class Network():
 		for i in set_string_node:
 			self.set_nodes[i]=Node(i)
 
-	def getNode(self, node_name):
+	def get_node_by_name(self, node_name):
 		''' Get node from network by Node'''
 		if node_name in self.set_nodes:
 			return self.set_nodes[node_name]
@@ -112,13 +158,30 @@ class Network():
 	
 	def parent_modification(self, name_node, name_node_parent):
 		''' Get a node and then add a parent'''
-		node_to_edit = self.getNode(name_node)
-		parent = self.getNode(name_node_parent)
+		node_to_edit = self.get_node_by_name(name_node)
+		parent = self.get_node_by_name(name_node_parent)
 		if node_to_edit and parent:
 			node_to_edit.parents[name_node_parent]=parent
 
 	def __str__(self):
 		return "\n".join([ list(map(str, (k,v))) for k,v in self.set_nodes.items()])
+
+			    
+    
+	def get_ancestors(self,node_name):
+		"""Return set containing all vertices reachable from vertex."""
+		node = self.get_node_by_name(node_name)
+		visited = set()
+		q = deque([])
+		q.append(node.name)
+		visited.add(node.name)
+		while len(q)>0:
+			current = self.get_node_by_name(q.popleft())
+			for dest in current.parents.keys():
+				if dest not in visited:
+					visited.add(dest)
+					q.append(self.get_node_by_name(dest).name)
+		return visited
 
 
 
@@ -127,7 +190,6 @@ def main():
 	variables = str(input())
 	variables = variables.split(",")
 	variables = set([x.strip() for x in variables])
-
 	# Build Node Network (1)
 	bayes_network = Network(variables)
 
@@ -141,6 +203,10 @@ def main():
 		key = str(value_string[0])
 		value = value_string[1]
 		probability_table[key]=float(value)
+		if key.startswith('+') and '-'+key[1:] not in probability_table:
+			probability_table['-'+key[1:]]=1-probability_table[key]
+		if key.startswith('-') and '+'+key[1:] not in probability_table:
+			probability_table['+'+key[1:]]=1-probability_table[key]
 
 		# checking substringing
 		
