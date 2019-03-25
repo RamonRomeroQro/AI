@@ -214,6 +214,7 @@ def main():
 			
 	amount_queries = int(input())
 	queries = []
+	
 	for i in range(amount_queries):
 		query= str(input()).strip()
 		queries.append(query)
