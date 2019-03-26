@@ -1,8 +1,9 @@
 '''
     Copyright 2019 
-    © Ramon Romero   @RamonRomeroQro
     © Eduardo Larios @eduardolarios
     © Ale Lopez      @alelopezperez
+    © Ramon Romero   @RamonRomeroQro
+
 
     Intelligent Systems, ITESM.
 
@@ -19,11 +20,12 @@
 
     Special thanks to: 
     @rhomeister and the FLOSS/sudo comunity.
+    Python 3.7.2 (PEP8)
 
 '''
+
 from copy import deepcopy
 import re
-
 
 class Node:
     ''' Node abstraction '''
@@ -115,6 +117,49 @@ class Network():
            
         return val
 
+
+def query_evaluation(queries, bayes_network):
+    ''' Evaluates a list of queries '''
+    ans = []
+    for query in queries:
+        # Query processing
+        list_conditions = []
+        for q in query[0]:
+            list_conditions.append(q[1:])
+        
+        parents_numerator = []
+        ancestors_numerator = bayes_network.get_ancestors(list_conditions,  [], parents_numerator)
+
+        combinations_numerator = enumerate_all(ancestors_numerator)
+        numerator = 0
+
+        for elem in combinations_numerator:
+            elem = query[0] + elem
+            n= bayes_network.get_probability(elem)
+            numerator += n
+        if len(query[1]) > 0:
+            list_conditions = []
+            for q in query[1]:
+                list_conditions.append(q[1:])
+            parents_denominator = []
+            ancestors_denominator = bayes_network.get_ancestors(list_conditions, [], parents_denominator) 
+            combinations_denominator = enumerate_all(ancestors_denominator)
+            denominator = 0
+            for item in combinations_denominator:
+                item = query[1] + item
+                aux = bayes_network.get_probability(item)
+                denominator += aux
+            if (denominator == 0.0018998150000000002):
+                denominator=0.000594122
+            ans.append(str(round((numerator/denominator) , 7)))
+        else:
+            ans.append(str(round((numerator) , 7)))
+    
+    return "\n".join(ans)
+
+
+
+
 def enumerate(probabilities, start, end, combinations, sign, index):
     if index < len(probabilities):
         condition = deepcopy(probabilities[index])
@@ -183,40 +228,7 @@ def main():
         queries.append(query)
 
 
-    for query in queries:
-        # Query processing
-        list_conditions = []
-        for q in query[0]:
-            list_conditions.append(q[1:])
-        
-        parents_numerator = []
-        ancestors_numerator = bayes_network.get_ancestors(list_conditions,  [], parents_numerator)
-
-        combinations_numerator = enumerate_all(ancestors_numerator)
-        numerator = 0
-
-        for elem in combinations_numerator:
-            elem = query[0] + elem
-            n= bayes_network.get_probability(elem)
-            numerator += n
-        if len(query[1]) > 0:
-            list_conditions = []
-            for q in query[1]:
-                list_conditions.append(q[1:])
-            parents_denominator = []
-            ancestors_denominator = bayes_network.get_ancestors(list_conditions, [], parents_denominator)
-           
-            combinations_denominator = enumerate_all(ancestors_denominator)
-            denominator = 0
-            for item in combinations_denominator:
-                item = query[1] + item
-                aux = bayes_network.get_probability(item)
-                denominator += aux
-            if (denominator == 0.0018998150000000002):
-                denominator=0.000594122
-            print(round((numerator/denominator) , 7))
-        else:
-            print(round((numerator) , 7))
+    print (query_evaluation(queries, bayes_network))
 
 if __name__ == "__main__":
     main()
