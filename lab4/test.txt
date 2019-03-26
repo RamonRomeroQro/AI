@@ -1,0 +1,11 @@
+Pollution,Cancer,Xray,Dyspnoea
+7
++Pollution=0.1
++Cancer|+Pollution=0.02
++Cancer|-Pollution=0.001
++Xray|+Cancer=0.9
++Xray|-Cancer=0.2
++Dyspnoea|+Cancer=0.65
++Dyspnoea|-Cancer=0.30
+1
++Cancer

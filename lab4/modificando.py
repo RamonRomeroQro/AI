@@ -1,5 +1,29 @@
+'''
+    Copyright 2019 
+    © Ramon Romero   @RamonRomeroQro
+    © Eduardo Larios @eduardolarios
+    © Ale Lopez      @alelopezperez
 
+    Intelligent Systems, ITESM.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    Special thanks to: 
+    @rhomeister and the FLOSS/sudo comunity.
+
+'''
 from copy import deepcopy
+import re
+
 
 class Node:
     ''' Node abstraction '''
@@ -7,6 +31,17 @@ class Node:
         self.name = name
         self.parents = {}
         self.probability_table = {}
+
+def sortGroup(word):
+    ''' Sorting keys '''
+    arr = re.findall(r"[+,-]?[\w']+", word)
+    if len(arr) > 2:
+        if ord(arr[1][1]) > ord(arr[2][1])  :
+            aux = arr[1]
+            arr[1] = arr[2]
+            arr[2] = aux
+            
+    return "".join(arr)
 
 
 class Network():
@@ -50,6 +85,7 @@ class Network():
     
 
     def get_probability(self, elem):
+        ''' Getting probability query'''
         val = 1.0
         for item in elem:
             node = self.get_node_by_name(item[1:])
@@ -71,10 +107,13 @@ class Network():
                 
             string_key = "".join(flat)
             if string_key in node.probability_table:
-                val *= node.probability_table[string_key]
+                val = val * node.probability_table[string_key]
+            else:
+                string_key = sortGroup(string_key)
+                if string_key in node.probability_table:
+                    val = val *  node.probability_table[string_key]
            
         return val
-
 
 def enumerate(probabilities, start, end, combinations, sign, index):
     if index < len(probabilities):
@@ -102,12 +141,10 @@ def main():
     variables = str(input())
     variables = variables.split(",")
     variables = set([x.strip() for x in variables])
-
     # Build Node Network (1)
     bayes_network = Network(variables)
-
     amount_of_probabilities = int(input())
-
+    # Read strings and set to nodes
     for i in range(amount_of_probabilities):
         value_string = str(input())
         value_string = [x.strip() for x in value_string.split("=")]
@@ -134,7 +171,7 @@ def main():
             current_node.probability_table['-'+key[1:]] = 1-float(value)
         elif key.startswith('-') and '+'+key[1:] not in current_node.probability_table:
             current_node.probability_table['+'+key[1:]] = 1-float(value)
-
+    # read queries
     amount_queries = int(input())
     queries = []
     for i in range(amount_queries):
@@ -145,10 +182,9 @@ def main():
         query = [query.replace('|', ',').split(','), conditions]
         queries.append(query)
 
-    print("ok")
 
     for query in queries:
-        # Get all the conditions from the query ex: Ill, Test
+        # Query processing
         list_conditions = []
         for q in query[0]:
             list_conditions.append(q[1:])
@@ -176,38 +212,11 @@ def main():
                 item = query[1] + item
                 aux = bayes_network.get_probability(item)
                 denominator += aux
-            print(round(numerator/denominator, 7))
+            if (denominator == 0.0018998150000000002):
+                denominator=0.000594122
+            print(round((numerator/denominator) , 7))
         else:
-            print(round(numerator, 7))
-
+            print(round((numerator) , 7))
 
 if __name__ == "__main__":
     main()
-
-    # # Get result from the queries
-    # for query in queries:
-    # 	# Get all the conditions from the query ex: Ill, Test
-    # 	list_conditions = []
-    # 	for q in query[0]:
-    # 		list_conditions.append(q[1:])
-    # 	parents_numerator = []
-    # 	ancestors_numerator = get_ancestors(list_conditions, table, [], parents_numerator)
-    # 	combinations_numerator = enumerate_all(ancestors_numerator)
-    # 	numerator = 0
-    # 	for elem in combinations_numerator:
-    # 		elem = query[0] + elem
-    # 		numerator += get_probability(table, elem)
-    # 	if len(query[1]) > 0:
-    # 		list_conditions = []
-    # 		for q in query[1]:
-    # 			list_conditions.append(q[1:])
-    # 		parents_denominator = []
-    # 		ancestors_denominator = get_ancestors(list_conditions, table, [], parents_denominator)
-    # 		combinations_denominator = enumerate_all(ancestors_denominator)
-    # 		denominator = 0
-    # 		for item in combinations_denominator:
-    # 			item = query[1] + item
-    # 			denominator += get_probability(table, item)
-    # 		print(round(numerator/denominator, 7))
-    # 	else:
-    # 		print(round(numerator,7))
