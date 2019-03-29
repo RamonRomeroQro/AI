@@ -167,10 +167,10 @@ def get_combinations(probabilities, start, end, combinations, sign, index):
         condition = deepcopy(probabilities[index])
         for j in range(start, end):
             combinations[j][index] = sign + condition
-            enumerate(probabilities, start, start +
-                      int((end-start)/2), combinations, '+', index+1)
-            enumerate(probabilities, start + int((end-start)/2),
-                      end, combinations, '-', index+1)
+            get_combinations(probabilities, start, start +
+                             int((end-start)/2), combinations, '+', index+1)
+            get_combinations(probabilities, start + int((end-start)/2),
+                             end, combinations, '-', index+1)
 
 
 def get_all_combinations(probabilities):
