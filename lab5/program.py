@@ -3,14 +3,16 @@ from copy import deepcopy
 import math
 
 class DataSet():
+    ''' Data set class abstractiion'''
     def __init__(self):
         self.relationship_name=""
         self.attributes={}
         self.list_attributes=[]
-        self.info = defaultdict(list)
-        self.listed_info = []
+        self.info = defaultdict(list) # arr row
+        self.listed_info = [] #arr dic
         
     def update_from_input(self):
+        ''' Read from input '''
         while (1):
             try:
                 read_line = str(input()).strip()
@@ -66,45 +68,25 @@ class DataSet():
             if key in element and element[key]==value:
                 new_listed_info.append(element)
 
-        d={}
         new_info = defaultdict(list)
-        for e in new_info:
-            for k,v in e:
-                new_info[k].append(v)
+        if key in self.info:
+            for e in self.info[key]:
+                if e == value:
+                    new_info[key].append(e)
+        
 
-        ndts= Node()
+        ndts= DataSet()
         ndts.relationship_name=self.relationship_name
         ndts.attributes=self.attributes
         ndts.info=new_info
         ndts.listed_info=new_listed_info
         return ndts
 
-    
-
-    def calc_entropy(data_set, key):
-        vertical_slice = data_set.info[key]
-        counter = Counter(vertical_slice)
-        amount_vars=len(vertical_slice)
-        entropy = 0
-        values={}
-        for k,v in counter.items():
-            values[k]=(-v/amount_vars)*math.log2(v/amount_vars)
-            entropy=entropy+(-v/amount_vars)*math.log2(v/amount_vars)
-        return entropy, values
-
-
-
-        
-
+     
 if __name__ == "__main__":
     data_set=DataSet()
     data_set.update_from_input()
-    initial_key=data_set.list_attributes[-1]
-    for i in data_set.info.keys():
-        if i != initial_key:
-
-   
-
-    
-    print('kek')
-                
+    f = open("qk.csv", "w+")
+    f.write(",".join(data_set.list_attributes)+"\n")
+    f.write("\n".join([",".join([v for v in i.values()]) for i in data_set.listed_info]))
+    f.close()

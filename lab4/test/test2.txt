@@ -1,0 +1,13 @@
+BeTired,Go,Drink,GetLaid,GetWasted
+9
++BeTired=0.3
++Go|+Tired=.05
++Go|-Tired=.85
++Drink|+Go=.99
++Drink|-Go=.5
++GetLaid|+Drink=.55
++GetLaid|-Drink=.05
++GetWasted|+GetLaid=.01
++GetWasted|-GetLaid=.99
+1
++GetWasted
