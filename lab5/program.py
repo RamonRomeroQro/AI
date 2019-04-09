@@ -68,8 +68,10 @@ class DataSet():
                         attribute_name = read_line[1]
                         self.list_attributes.append(attribute_name)
                         unparsed_possibilities = read_line[2:]
-                        unparsed_possibilities = "".join(unparsed_possibilities)
-                        unparsed_possibilities = unparsed_possibilities.strip('{').strip('}').split(',')
+                        unparsed_possibilities = "".join(
+                            unparsed_possibilities)
+                        unparsed_possibilities = unparsed_possibilities.strip(
+                            '{').strip('}').split(',')
                         self.attributes[attribute_name] = unparsed_possibilities
                     elif read_line.startswith("@data"):
                         while(1):
@@ -112,6 +114,7 @@ def all_same_desition(data_set):
     last_key = data_set.list_attributes[-1]
     counter1 = Counter(data_set.info[last_key])
     return counter1
+
 
 def split_by_key(data_set, key):
     ''' information gain by key '''
@@ -206,7 +209,7 @@ def generate_tree(data_set, deepth):
         arr_data = splitter(data_set, node)
         for i in data_set.attributes[node]:
             for k, v in arr_data.items():
-                if k==i:
+                if k == i:
                     print(((" "*deepth)+node+": "+str(k)))
                     generate_tree(v, deepth+1)
 
