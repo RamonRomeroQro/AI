@@ -98,25 +98,26 @@ def calculate_information_gain(dataframe, p, current_entropy, data_set):
 # Stores in a dictionary how many times each value of the result occurs in the given part of the dataframe
 # Output example {"yes":9, "no":4}
 def count_occurrences(dataframe, data_set):
-    y_column_name = list(data_set.attributes.keys())[-1]
+    y_column_name = data_set.list_attributes[0]
     total_count = dataframe[y_column_name].value_counts().to_dict()
     return total_count
 
 
-def same_y_values(dataframe, data_set):
-    y_values = len(count_occurrences(dataframe, data_set))
-    return y_values == 1
+def same_desition(dataframe, data_set):
+    ''' Check if dataframe only contains a single destition value'''
+    c = Counter(data_set.info[data_set.list_attributes[-1]])
+    return len(c) == 1
 
 
 def generate_tree_model(dataframe, depth, data_set):
     tabulation = "  " * depth
-    if same_y_values(dataframe, data_set):
+    if same_desition(dataframe, data_set):
         # print("all y values are the same, entropy is 0")
-        y_column_name = list(data_set.attributes.keys())[-1]
+        y_column_name = data_set.list_attributes[-1]  
         y_value = dataframe[y_column_name].iloc[0]
         print(tabulation + "ANSWER: {0}".format(y_value))
         return
-    x_headers = list(dataframe.columns.values)[:-1]  # get x headers (ex. outlook temperature humidity  windy play)
+    x_headers = data_set.list_attributes[:-1]  # get x headers (ex. outlook temperature humidity  windy play)
     current_entropy = calculate_entropy(dataframe, data_set)
 
     max_information_gain = 0

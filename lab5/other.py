@@ -52,15 +52,6 @@ class DataSet():
             except EOFError:
                 break
     
-# Here is DL to LD:
-
-# v = [dict(zip(DL,t)) for t in zip(*DL.values())]
-# print(v)
-
-# and LD to DL:
-
-# v = {k: [dic[k] for dic in LD] for k in LD[0]}
-# print(v)
 
     def subset(self, key, value):
         new_listed_info=[]
@@ -74,7 +65,6 @@ class DataSet():
                 if e == value:
                     new_info[key].append(e)
         
-
         ndts= DataSet()
         ndts.relationship_name=self.relationship_name
         ndts.attributes=self.attributes
@@ -83,12 +73,6 @@ class DataSet():
         return ndts
     
    
-    def info_gain(self):
-        #         LLLLLMMMHH
-        # Married = LLLLM = -1*((4/5 log2(4/5))+(1/5 log2(1/5))) = .72
-        # Single = LMMHH = -1*((1/5 log2(1/5))+(2/5 log2(2/5)) + (2/5 log2(2/5))) = 1.52
-        # ----> 1.48- (5/10 * .72 + 5/10*1.52) = .36
-        pass
 
 
     def select_where(self,key, desition_key):
@@ -131,16 +115,103 @@ def counter_by_listdict(listdict, key_to_count):
 
 
 
-import pandas as pd
+def calc_entropy_desition(data_set):
+    '''calcular entropia de desicion dado un dataset'''
+    last_key=data_set.list_attributes[-1]
+    arr=data_set.info[last_key]
+    counter1= Counter(arr)
+    entropy= 0
+    for v in counter1.values(): 
+        entropy= entropy + ((v/len(arr)) * math.log2((v/len(arr)))  )
+    return entropy*-1
+
+def all_same_desition(data_set):
+    last_key=data_set.list_attributes[-1]
+    counter1= Counter(data_set.info[last_key])
+    return counter1
+
+def split_by_key(data_set, key):
+    desition_key=data_set.list_attributes[-1]
+    elements_splited_by_key=defaultdict(list)
+    for element in data_set.listed_info:
+        if element[key] not in elements_splited_by_key:
+            elements_splited_by_key[element[key]].append(element)
+        else:
+            elements_splited_by_key[element[key]].append(element)
+
+    counter_by_cat={} # contador de elementos dentro de columna
+    for k,v in elements_splited_by_key.items():
+        counter_by_cat[k]=len(v)
+
+    counter_cat_desition={}
+    elements_key_desition={}
+    for k,l in elements_splited_by_key.items():
+        elements_key_desition[k]=defaultdict(list)
+        for i in l:
+            if i[desition_key] not in elements_key_desition[k]:
+                elements_key_desition[k][i[desition_key]].append(i)
+            else:
+                elements_key_desition[k][i[desition_key]].append(i)
+
+    counter_cat_desition={}
+    for k,v in elements_key_desition.items():
+        counter_cat_desition[k]={}
+        for e in v:
+            counter_cat_desition[k][e]=len(elements_key_desition[k][e])
+    entropies={}
+    for k,v  in counter_cat_desition.items():
+        middle_entropy=0
+
+        for i in v:
+            middle_entropy=middle_entropy+ (((counter_cat_desition[k][i])/(counter_by_cat[k]))*math.log(((counter_cat_desition[k][i])/(counter_by_cat[k]))))
+        entropies[k]=(middle_entropy*-1)
+        # Married = LLLLM = -1*((4/5 log2(4/5))+(1/5 log2(1/5))) = .72
+        # Single = LMMHH = -1*((1/5 log2(1/5))+(2/5 log2(2/5)) + (2/5 log2(2/5))) = 1.52
+
+    size_set = sum([v for v in counter_by_cat.values()])
+
+    return counter_by_cat, entropies, size_set
+
+
+    
+
+
+
+        
+
+    
+
+
+def generate_tree(data_set, deepth):
+    counter = all_same_desition(data_set)
+    if len(counter)==1:
+        print ("all same retu")
+        return
+    else:
+        current_entropy = calc_entropy_desition(data_set)
+        max_gain=-100
+        node=""
+        for columna in data_set.list_attributes[:-1]:
+            counter_cat, entropies, size_set = split_by_key( data_set, columna)
+            sub=0
+            for k,v in counter_cat.items():
+                sub=sub+((v/size_set)*entropies[k])
+            infogain=current_entropy-sub
+            if infogain>max_gain:
+                max_gain=infogain
+                node=columna
+
+        print('Root->', node)
+
+
+
+            #1.48- (5/10 * .72 + 5/10*1.52) = .36
+
 def main():
     data_set=DataSet()
     data_set.update_from_input()
-    f = open("qk.csv", "w+")
-    f.write(",".join(data_set.list_attributes)+"\n")
-    f.write("\n".join([",".join([v for v in i.values()]) for i in data_set.listed_info]))
-    f.close()
-    a=pd.read_csv("qk.csv", delimiter=',')
-    print(a)
+    generate_tree(data_set, 0)
+   
 
 if __name__ == "__main__":
     main()
