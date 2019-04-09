@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     Special thanks to: 
-    @rhomeister and the FLOSS/SUDO comunity.
+    Ruben Stranders @rhomeister and the FLOSS/SUDO comunity.
     Python 3.7.2 (PEP8)
 
 '''
@@ -68,9 +68,9 @@ class DataSet():
                         attribute_name = read_line[1]
                         self.list_attributes.append(attribute_name)
                         unparsed_possibilities = read_line[2:]
-                        possibilities = [x.strip('{').strip('}').strip(
-                            ',') for x in unparsed_possibilities]
-                        self.attributes[attribute_name] = set(possibilities)
+                        unparsed_possibilities = "".join(unparsed_possibilities)
+                        unparsed_possibilities = unparsed_possibilities.strip('{').strip('}').split(',')
+                        self.attributes[attribute_name] = unparsed_possibilities
                     elif read_line.startswith("@data"):
                         while(1):
                             try:
@@ -204,10 +204,11 @@ def generate_tree(data_set, deepth):
                 node = columna
 
         arr_data = splitter(data_set, node)
-
-        for k, v in arr_data.items():
-            print(((" "*deepth)+node+": "+str(k)))
-            generate_tree(v, deepth+1)
+        for i in data_set.attributes[node]:
+            for k, v in arr_data.items():
+                if k==i:
+                    print(((" "*deepth)+node+": "+str(k)))
+                    generate_tree(v, deepth+1)
 
 
 def main():
