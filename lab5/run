@@ -1,8 +1,0 @@
-#!/bin/bash
-apt-get install python3-venv
-python3 -m venv lab5
-source ./lab5/bin/activate
-pip install pandas
-python3 program.py 
-deactivate
-rm -rf ./lab5
