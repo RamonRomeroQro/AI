@@ -1,5 +1,5 @@
 from collections import defaultdict, Counter
-from copy import deepcopy
+import copy
 import math
 
 class DataSet():
@@ -10,6 +10,22 @@ class DataSet():
         self.list_attributes=[]
         self.info = defaultdict(list) # arr row
         self.listed_info = [] #arr dic
+    
+    def change_from_listed(self, list_i):
+        self.listed_info=list_i
+        self.info={k: [dic[k] for dic in self.listed_info] for k in self.listed_info[0]}
+
+        pass
+
+	# Here is DL to LD:
+	
+	# v = [dict(zip(DL,t)) for t in zip(*DL.values())]
+	# print(v)
+	
+	# and LD to DL:
+	
+	# v = {k: [dic[k] for dic in LD] for k in LD[0]}
+	# print(v)
         
     def update_from_input(self):
         ''' Read from input '''
@@ -52,67 +68,6 @@ class DataSet():
             except EOFError:
                 break
     
-
-    def subset(self, key, value):
-        new_listed_info=[]
-        for element in self.listed_info:
-            if key in element and element[key]==value:
-                new_listed_info.append(element)
-
-        new_info = defaultdict(list)
-        if key in self.info:
-            for e in self.info[key]:
-                if e == value:
-                    new_info[key].append(e)
-        
-        ndts= DataSet()
-        ndts.relationship_name=self.relationship_name
-        ndts.attributes=self.attributes
-        ndts.info=new_info
-        ndts.listed_info=new_listed_info
-        return ndts
-    
-   
-
-
-    def select_where(self,key, desition_key):
-        splits = defaultdict(list)
-        for e in self.listed_info:
-            if e[key] not in splits:
-                splits[e[key]]=e
-            else:
-                splits[e[key]].append(e)
-
-        partials={}
-        for k,v in splits.items():
-            counter, len1= counter_by_listdict(v,desition_key)
-            s=0
-            for v2 in counter.values():
-                s=s+((v2/len(len1))* math.log2(v2/len(len1)))
-            partials[k]=(s*-1)
-
-
-        other, len2 = counter_by_listdict(self.info ,desition_key)
-        s2=0
-        for v3 in other.values():
-            s2=s2+((v3/len(len2))* math.log2(v3/len(len2)))
-        s2=(s2*-1)
-
-
-
-
-
-def counter_by_listdict(listdict, key_to_count):
-    c={}
-    for i in listdict:
-        if listdict[key_to_count] not in c:
-            c[listdict[key_to_count]]=1
-        else:
-            c[listdict[key_to_count]]=c[listdict[key_to_count]]+1
-
-    s= sum([v for v in c.values()])
-    return c, s
-
 
 
 def calc_entropy_desition(data_set):
@@ -172,20 +127,35 @@ def split_by_key(data_set, key):
 
     return counter_by_cat, entropies, size_set
 
+def splitter(data_set, key):
+    splitted=defaultdict(list)
+    for e in data_set.listed_info:
+        if e[key] not in splitted:
+            splitted[e[key]].append(e)
+        else:
+            splitted[e[key]].append(e)
+    arrdata=[]
+    updated_list=copy.deepcopy(data_set.list_attributes)
+    updated_list.remove(key)
 
+    for  v in splitted.values():
+        new_data_set= DataSet()
+        new_data_set.change_from_listed(v) # info and listed info
+        new_data_set.relationship_name=data_set.relationship_name
+        new_data_set.list_attributes=updated_list
+        for col in new_data_set.list_attributes:
+            new_data_set.attributes[col]=data_set.attributes[col]
+        arrdata.append(new_data_set)     
     
-
-
-
+    return arrdata
         
-
-    
 
 
 def generate_tree(data_set, deepth):
     counter = all_same_desition(data_set)
     if len(counter)==1:
-        print ("all same retu")
+        for k in counter.keys():
+            print("!!!",k)
         return
     else:
         current_entropy = calc_entropy_desition(data_set)
@@ -201,11 +171,17 @@ def generate_tree(data_set, deepth):
                 max_gain=infogain
                 node=columna
 
-        print('Root->', node)
+        print(("SPLIT BY "+node))
+
+        arr_data = splitter(data_set, node)
+
+        print(("len: "+str(len(arr_data))))
 
 
+        for i in arr_data:
+            generate_tree(i, deepth+1)
 
-            #1.48- (5/10 * .72 + 5/10*1.52) = .36
+
 
 def main():
     data_set=DataSet()
