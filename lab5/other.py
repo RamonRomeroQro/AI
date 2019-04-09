@@ -15,8 +15,6 @@ class DataSet():
         self.listed_info=list_i
         self.info={k: [dic[k] for dic in self.listed_info] for k in self.listed_info[0]}
 
-        pass
-
 	# Here is DL to LD:
 	
 	# v = [dict(zip(DL,t)) for t in zip(*DL.values())]
