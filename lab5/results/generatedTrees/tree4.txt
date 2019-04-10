@@ -1,0 +1,7 @@
+outlook: Sunny
+ humidity: High
+   ANSWER: No
+ humidity: Normal
+   ANSWER: Yes
+outlook: Overcast
+  ANSWER: Yes
