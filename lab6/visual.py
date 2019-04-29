@@ -20,8 +20,8 @@
     Python 3.7.2 (PEP8)
 
 '''
-# import matplotlib.pyplot as plt
-# import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def dot_product(values, weights):
@@ -91,8 +91,8 @@ def main():
         training.append(t)
     
     
-    # plt.plot(ptx, pty, "bo") 
-    # plt.plot(ntx, nty, "ro") 
+    plt.plot(ptx, pty, "bo") 
+    plt.plot(ntx, nty, "ro") 
     # ditto
     #plt.scatter(tx, ty)
     # print (training)
@@ -131,20 +131,20 @@ def main():
         my=weights[1]
         mx=-weights[0]
         m=my/mx
-        # x = np.linspace(-2,2,100)
-        # y = m*x+pb
-        # plt.plot(x, y, '-g', label='ono')
+        x = np.linspace(-2,2,100)
+        y = m*x+pb
+        plt.plot(x, y, '-g', label='ono')
         
-        # print("w, bias = ", weights, pb)
+        print("w, bias = ", weights, pb)
 
-        # print("y = "+str(m)+"x"+"+"+str(pb))
+        print("y = "+str(m)+"x"+"+"+str(pb))
 
     else:
         print("no solution found")
     
-    # plt.plot(pvx, pvy, "yo") # and y using blue circle markers
-    # plt.plot(nvx, nvy, "co") # and y using blue circle markers
-    # #plt.show()
+    plt.plot(pvx, pvy, "yo") # and y using blue circle markers
+    plt.plot(nvx, nvy, "co") # and y using blue circle markers
+    plt.show()
 
 
 if __name__ == "__main__":
