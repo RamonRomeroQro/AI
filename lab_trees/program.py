@@ -119,10 +119,10 @@ def all_same_desition(data_set):
 def split_by_key(data_set, key):
     ''' information gain by key '''
     desition_key = data_set.list_attributes[-1]
-    elements_splited_by_key = defaultdict(list)
+    elements_splited_by_key = {}
     for element in data_set.listed_info:
         if element[key] not in elements_splited_by_key:
-            elements_splited_by_key[element[key]].append(element)
+            elements_splited_by_key[element[key]]=[element]
         else:
             elements_splited_by_key[element[key]].append(element)
 
@@ -133,10 +133,10 @@ def split_by_key(data_set, key):
     counter_cat_desition = {}
     elements_key_desition = {}
     for k, l in elements_splited_by_key.items():
-        elements_key_desition[k] = defaultdict(list)
+        elements_key_desition[k] = {}
         for i in l:
             if i[desition_key] not in elements_key_desition[k]:
-                elements_key_desition[k][i[desition_key]].append(i)
+                elements_key_desition[k][i[desition_key]]=[i]
             else:
                 elements_key_desition[k][i[desition_key]].append(i)
 
@@ -163,10 +163,10 @@ def split_by_key(data_set, key):
 
 def splitter(data_set, key):
     ''' generate subset by key '''
-    splitted = defaultdict(list)
+    splitted = {}
     for e in data_set.listed_info:
         if e[key] not in splitted:
-            splitted[e[key]].append(e)
+            splitted[e[key]]=[e]
         else:
             splitted[e[key]].append(e)
     arrdata = {}
