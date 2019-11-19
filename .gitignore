@@ -1,7 +1,5 @@
 venv
 *.out
 .DS*
-.vscode
-.vscode/
 *.zip
 others
